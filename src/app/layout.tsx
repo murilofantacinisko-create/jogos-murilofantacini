@@ -31,7 +31,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <Sidebar />
-        <main className="ml-64 h-screen overflow-y-auto p-8">{children}</main>
+        <main id="main-content" className="ml-64 h-screen overflow-y-auto p-8">
+          {children}
+        </main>
       </body>
     </html>
   );

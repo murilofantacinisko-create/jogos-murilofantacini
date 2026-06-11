@@ -125,6 +125,30 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const main = document.getElementById("main-content");
+    if (!main) return;
+
+    if (visao === "outros") {
+      main.style.backgroundImage = "url('/estadio.jpeg')";
+      main.style.backgroundSize = "cover";
+      main.style.backgroundPosition = "center";
+      main.style.backgroundRepeat = "no-repeat";
+    } else {
+      main.style.backgroundImage = "";
+      main.style.backgroundSize = "";
+      main.style.backgroundPosition = "";
+      main.style.backgroundRepeat = "";
+    }
+
+    return () => {
+      main.style.backgroundImage = "";
+      main.style.backgroundSize = "";
+      main.style.backgroundPosition = "";
+      main.style.backgroundRepeat = "";
+    };
+  }, [visao]);
+
   const jogos = visao === "profissional" ? jogosProfissional : jogosOutros;
 
   function selecionarVisao(novaVisao: Visao) {
@@ -354,19 +378,7 @@ export default function DashboardPage() {
   })();
 
   return (
-    <div
-      className="relative -m-8 min-h-screen p-8"
-      style={
-        visao === "outros"
-          ? {
-              backgroundImage: "url('/estadio.jpeg')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundColor: "transparent",
-            }
-          : {}
-      }
-    >
+    <div className="relative">
       <div
         style={{
           position: "fixed",
