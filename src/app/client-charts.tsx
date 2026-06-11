@@ -5,7 +5,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  Legend,
   Line,
   LineChart,
   Pie,
@@ -59,26 +58,47 @@ export function ClientCharts({
           <h2 className="mb-2 text-sm font-semibold">
             Vitórias / Empates / Derrotas
           </h2>
-          <div className="h-52 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={distribuicao}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={40}
-                  outerRadius={65}
-                  paddingAngle={2}
-                  label={({ value }) => value}
-                >
-                  {distribuicao.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={tooltipStyle} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="flex h-52 w-full items-center gap-2">
+            <div className="h-full w-3/5">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={distribuicao}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={40}
+                    outerRadius={65}
+                    paddingAngle={2}
+                  >
+                    {distribuicao.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={tooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex w-2/5 flex-col gap-2">
+              {distribuicao.map((entry) => {
+                const total = distribuicao.reduce((acc, d) => acc + d.value, 0);
+                const pct = total > 0 ? (entry.value / total) * 100 : 0;
+                return (
+                  <div key={entry.name} className="flex items-center gap-2 text-xs">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                      style={{ backgroundColor: entry.color }}
+                    />
+                    <span className="flex-1 truncate text-muted-foreground">
+                      {entry.name}
+                    </span>
+                    <span className="font-semibold">{entry.value}</span>
+                    <span className="w-12 text-right text-muted-foreground">
+                      {pct.toFixed(1)}%
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
