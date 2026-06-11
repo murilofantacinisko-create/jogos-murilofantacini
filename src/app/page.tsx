@@ -372,6 +372,35 @@ export default function DashboardPage() {
         }}
       />
 
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundImage: `url('/estadio.jpeg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          zIndex: 0,
+          pointerEvents: "none",
+          display: visao === "outros" ? "block" : "none",
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0,0,0,0.75)",
+          zIndex: 0,
+          pointerEvents: "none",
+          display: visao === "outros" ? "block" : "none",
+        }}
+      />
+
       <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold sm:text-4xl">
