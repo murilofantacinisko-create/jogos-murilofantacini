@@ -41,3 +41,21 @@ model Gol {
   jogo        Jogo   @relation(fields: [jogoId], references: [id], onDelete: Cascade)
   jogoId      Int
 }
+
+model OutroEsporte {
+  id          Int      @id @default(autoincrement())
+  esporte     String
+  data        String
+  hora        String
+  diaSemana   String
+  campeonato  String
+  estadio     String
+  localizacao String
+  fase        String
+  timeA       String
+  timeB       String
+  vencedor    String
+  placarJson  String
+  info        String?
+  createdAt   DateTime @default(now())
+}
