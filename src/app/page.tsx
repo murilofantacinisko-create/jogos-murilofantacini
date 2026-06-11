@@ -10,9 +10,8 @@ import {
   MapPin,
   Award,
 } from "lucide-react";
-import { ClientCharts, EsportesPorAnoChart } from "./client-charts";
+import { ClientCharts } from "./client-charts";
 import { Jogo } from "@/types/jogo";
-import { OutroEsporte } from "@/types/esporte";
 import { cn } from "@/lib/utils";
 import { getTeamLogo } from "@/lib/teamLogos";
 
@@ -126,74 +125,6 @@ function TeamLogo({ team, size }: { team: string; size: number }) {
   );
 }
 
-const ESPORTE_LABELS: Record<string, string> = {
-  Volei: "Vôlei",
-  Basquete: "Basquete",
-  "Futebol Americano": "Futebol Americano",
-  Tenis: "Tênis",
-};
-
-function EsportesSection({
-  eventos,
-  loading,
-}: {
-  eventos: OutroEsporte[];
-  loading: boolean;
-}) {
-  const total = eventos.length;
-
-  const porEsporte = Array.from(
-    eventos.reduce((map, e) => {
-      map.set(e.esporte, (map.get(e.esporte) ?? 0) + 1);
-      return map;
-    }, new Map<string, number>())
-  )
-    .map(([esporte, count]) => ({ esporte, count }))
-    .sort((a, b) => b.count - a.count);
-
-  const eventosPorAno = Array.from(
-    eventos.reduce((map, e) => {
-      const ano = e.data.split("-")[0];
-      map.set(ano, (map.get(ano) ?? 0) + 1);
-      return map;
-    }, new Map<string, number>())
-  )
-    .map(([ano, eventosCount]) => ({ ano, eventos: eventosCount }))
-    .sort((a, b) => a.ano.localeCompare(b.ano));
-
-  if (loading) {
-    return <p className="text-muted-foreground">Carregando...</p>;
-  }
-
-  if (total === 0) {
-    return (
-      <div className="rounded-lg border border-border bg-card p-6">
-        <p className="text-muted-foreground">
-          Nenhum evento de outros esportes registrado ainda. Adicione em /admin.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total de Eventos" value={total} icon={Trophy} />
-        {porEsporte.map((e) => (
-          <StatCard
-            key={e.esporte}
-            label={ESPORTE_LABELS[e.esporte] ?? e.esporte}
-            value={e.count}
-            icon={Award}
-          />
-        ))}
-      </div>
-
-      <EsportesPorAnoChart data={eventosPorAno} />
-    </div>
-  );
-}
-
 function resultadoCorBolinha(resultado: string): string {
   switch (resultado) {
     case "Vitória":
@@ -216,12 +147,11 @@ function resultadoLetra(resultado: string): string {
   }
 }
 
-type Visao = "profissional" | "outros" | "esportes";
+type Visao = "profissional" | "outros";
 
 export default function DashboardPage() {
   const [jogosProfissional, setJogosProfissional] = useState<Jogo[]>([]);
   const [jogosOutros, setJogosOutros] = useState<Jogo[]>([]);
-  const [outrosEsportes, setOutrosEsportes] = useState<OutroEsporte[]>([]);
   const [loading, setLoading] = useState(true);
   const [visao, setVisao] = useState<Visao>("profissional");
   const [ano, setAno] = useState("Todos");
@@ -232,22 +162,15 @@ export default function DashboardPage() {
       fetch("/api/jogos?categoria=profissional").then((res) => res.json()),
       fetch("/api/jogos?categoria=outros-corinthians").then((res) => res.json()),
       fetch("/api/jogos?categoria=outros-jogos").then((res) => res.json()),
-      fetch("/api/esportes").then((res) => res.json()),
     ])
-      .then(([profissional, outrosCorinthians, outrosJogos, esportes]) => {
+      .then(([profissional, outrosCorinthians, outrosJogos]) => {
         setJogosProfissional(profissional);
         setJogosOutros([...outrosCorinthians, ...outrosJogos]);
-        setOutrosEsportes(esportes);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const jogos =
-    visao === "profissional"
-      ? jogosProfissional
-      : visao === "outros"
-        ? jogosOutros
-        : [];
+  const jogos = visao === "profissional" ? jogosProfissional : jogosOutros;
 
   function selecionarVisao(novaVisao: Visao) {
     setVisao(novaVisao);
@@ -602,24 +525,8 @@ export default function DashboardPage() {
         >
           Outros Jogos
         </button>
-        <button
-          type="button"
-          onClick={() => selecionarVisao("esportes")}
-          className={cn(
-            "rounded-md px-4 py-2 text-sm font-medium transition-colors",
-            visao === "esportes"
-              ? "bg-corinthians-red text-white"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          Outros Esportes
-        </button>
       </div>
 
-      {visao === "esportes" ? (
-        <EsportesSection eventos={outrosEsportes} loading={loading} />
-      ) : (
-      <>
       <div className="flex flex-col gap-4 sm:flex-row">
         <select
           value={ano}
@@ -910,8 +817,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </>
-      )}
-      </>
       )}
       </div>
     </div>

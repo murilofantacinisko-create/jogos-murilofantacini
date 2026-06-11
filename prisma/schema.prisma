@@ -41,21 +41,3 @@ model Gol {
   jogo        Jogo   @relation(fields: [jogoId], references: [id], onDelete: Cascade)
   jogoId      Int
 }
-
-model OutroEsporte {
-  id          Int      @id @default(autoincrement())
-  esporte     String // "Volei", "Basquete", "Futebol Americano", "Tenis"
-  data        String
-  hora        String
-  diaSemana   String
-  campeonato  String
-  estadio     String
-  localizacao String
-  fase        String
-  timeA       String
-  timeB       String
-  vencedor    String
-  placarJson  String // JSON string with sport-specific score details
-  info        String?
-  createdAt   DateTime @default(now())
-}
