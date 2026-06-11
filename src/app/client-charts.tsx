@@ -21,6 +21,29 @@ const tooltipStyle = {
   border: "1px solid #262626",
 };
 
+export function EsportesPorAnoChart({
+  data,
+}: {
+  data: { ano: string; eventos: number }[];
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <h2 className="mb-2 text-sm font-semibold">Eventos por Ano</h2>
+      <div className="h-52 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+            <XAxis dataKey="ano" stroke="#a1a1aa" tick={{ fontSize: 11 }} />
+            <YAxis allowDecimals={false} stroke="#a1a1aa" tick={{ fontSize: 11 }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Bar dataKey="eventos" fill="#CC0000" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 export function ClientCharts({
   jogosPorAno,
   distribuicao,
