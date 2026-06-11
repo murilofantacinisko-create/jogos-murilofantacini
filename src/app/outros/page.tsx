@@ -93,7 +93,10 @@ function PlacarEsporte({ esporte, placarJson }: { esporte: string; placarJson: s
 
 function EsporteCard({ evento }: { evento: OutroEsporte }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-6 transition-colors hover:bg-secondary">
+    <Link
+      href={`/esportes/${evento.id}`}
+      className="flex flex-col gap-2 rounded-lg border border-border bg-card p-6 transition-colors hover:bg-secondary"
+    >
       <div className="flex items-center justify-between">
         <span
           className={cn(
@@ -119,7 +122,7 @@ function EsporteCard({ evento }: { evento: OutroEsporte }) {
         {evento.estadio} • {evento.localizacao}
       </p>
       {evento.info && <p className="text-sm text-muted-foreground">{evento.info}</p>}
-    </div>
+    </Link>
   );
 }
 
