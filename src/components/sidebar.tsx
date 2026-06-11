@@ -16,7 +16,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-border bg-card">
+    <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col overflow-y-auto border-r border-border bg-card">
       <div className="flex h-16 items-center gap-2 border-b border-border px-6">
         <span className="text-lg font-bold tracking-tight">
           Meus Jogos
