@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { hasAdminSession } from "@/lib/client-auth";
 import { Jogo } from "@/types/jogo";
 
 function resultadoCor(resultado: string) {
@@ -20,7 +21,16 @@ function resultadoCor(resultado: string) {
 export default function OutrosJogoDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const id = params.id as string;
+
+  function requireAuth(): boolean {
+    if (!hasAdminSession()) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return false;
+    }
+    return true;
+  }
 
   const [jogo, setJogo] = useState<Jogo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -144,7 +154,9 @@ export default function OutrosJogoDetailPage() {
             </button>
           ) : (
             <button
-              onClick={() => setEditing(true)}
+              onClick={() => {
+                if (requireAuth()) setEditing(true);
+              }}
               className="rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
             >
               Editar
@@ -152,7 +164,9 @@ export default function OutrosJogoDetailPage() {
           )}
 
           <button
-            onClick={handleDelete}
+            onClick={() => {
+              if (requireAuth()) handleDelete();
+            }}
             className="flex items-center gap-2 rounded-md border border-corinthians-red px-4 py-2 text-sm font-semibold text-corinthians-red hover:bg-corinthians-red/10"
           >
             <Trash2 className="h-4 w-4" />
