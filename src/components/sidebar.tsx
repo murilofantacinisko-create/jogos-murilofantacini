@@ -22,7 +22,7 @@ export function Sidebar() {
           Meus Jogos
         </span>
       </div>
-      <nav className="flex flex-col gap-1 p-4">
+      <nav className="flex flex-1 flex-col gap-1 p-4">
         {links.map(({ href, label, icon: Icon }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -44,6 +44,15 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <div className="flex items-center gap-3 border-t border-border px-6 py-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-corinthians-red bg-black text-[10px] font-extrabold tracking-wider text-white">
+          SCCP
+        </div>
+        <span className="text-sm font-bold text-corinthians-red">
+          Vai, Corinthians!
+        </span>
+      </div>
     </aside>
   );
 }

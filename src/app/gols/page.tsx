@@ -91,7 +91,7 @@ export default function GolsPage() {
                         border: "1px solid #262626",
                       }}
                     />
-                    <Bar dataKey="gols" fill="#8B0000" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="gols" fill="#CC0000" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -112,7 +112,7 @@ export default function GolsPage() {
                       border: "1px solid #262626",
                     }}
                   />
-                  <Bar dataKey="gols" fill="#8B0000" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="gols" fill="#CC0000" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

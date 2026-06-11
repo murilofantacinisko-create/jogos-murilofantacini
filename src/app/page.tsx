@@ -32,7 +32,7 @@ function StatCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-6">
+    <div className="flex items-center gap-4 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-6">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
         <Icon className="h-6 w-6" />
       </div>
@@ -40,6 +40,19 @@ function StatCard({
         <p className="text-sm text-muted-foreground">{label}</p>
         <p className="text-2xl font-bold">{value}</p>
       </div>
+    </div>
+  );
+}
+
+function SccpCrest({ size = "h-12 w-12" }: { size?: string }) {
+  return (
+    <div
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full border-2 border-corinthians-red bg-black text-xs font-extrabold tracking-wider text-white",
+        size
+      )}
+    >
+      SCCP
     </div>
   );
 }
@@ -176,7 +189,7 @@ export default function DashboardPage() {
   const distribuicao = [
     { name: "Vitórias", value: vitorias, color: "#22c55e" },
     { name: "Empates", value: empates, color: "#eab308" },
-    { name: "Derrotas", value: derrotas, color: "#8B0000" },
+    { name: "Derrotas", value: derrotas, color: "#CC0000" },
   ];
 
   const aproveitamentoPorCampeonato = Array.from(
@@ -327,11 +340,59 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">
+          Meu Histórico <span className="text-corinthians-red">Alvinegro</span>
+        </h1>
         <p className="text-muted-foreground">
-          Resumo geral dos jogos acompanhados
+          Acompanhe todos os jogos que você já esteve presente.
         </p>
       </div>
+
+      {visao === "profissional" && totalJogos > 0 && (
+        <div className="flex flex-col gap-6 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <SccpCrest size="h-16 w-16" />
+            <div>
+              <h2 className="text-2xl font-bold">Corinthians Profissional</h2>
+              <p className="text-sm text-muted-foreground">
+                {totalJogos} jogo{totalJogos !== 1 ? "s" : ""} acompanhado
+                {totalJogos !== 1 ? "s" : ""}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-6 sm:gap-10">
+            <div>
+              <p className="text-xs uppercase text-muted-foreground">
+                Aproveitamento
+              </p>
+              <p className="text-xl font-bold">{aproveitamento.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground">
+                Total de Gols
+              </p>
+              <p className="text-xl font-bold">{golsVistos}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground">
+                Média de Gols
+              </p>
+              <p className="text-xl font-bold">{mediaGols.toFixed(2)}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground">
+                Média de Público
+              </p>
+              <p className="text-xl font-bold">
+                {jogosComPublico.length
+                  ? Math.round(mediaPublico).toLocaleString("pt-BR")
+                  : "-"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex w-fit rounded-lg border border-border bg-card p-1">
         <button

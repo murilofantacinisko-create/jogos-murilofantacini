@@ -60,7 +60,7 @@ const config: Config = {
         corinthians: {
           black: "#000000",
           white: "#FFFFFF",
-          red: "#8B0000",
+          red: "#CC0000",
         },
       },
       borderRadius: {

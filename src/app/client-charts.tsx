@@ -48,7 +48,7 @@ export function ClientCharts({
               <XAxis dataKey="ano" stroke="#a1a1aa" />
               <YAxis allowDecimals={false} stroke="#a1a1aa" />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="jogos" fill="#8B0000" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="jogos" fill="#CC0000" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -109,7 +109,7 @@ export function ClientCharts({
                 contentStyle={tooltipStyle}
                 formatter={(value: ValueType | undefined) => [`${value}%`, "Aproveitamento"]}
               />
-              <Bar dataKey="aproveitamento" fill="#8B0000" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="aproveitamento" fill="#CC0000" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -157,7 +157,7 @@ export function ClientCharts({
               <XAxis dataKey="faixa" stroke="#a1a1aa" />
               <YAxis allowDecimals={false} stroke="#a1a1aa" />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="gols" fill="#8B0000" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="gols" fill="#CC0000" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -178,9 +178,9 @@ export function ClientCharts({
               <Line
                 type="monotone"
                 dataKey="aproveitamento"
-                stroke="#8B0000"
+                stroke="#CC0000"
                 strokeWidth={2}
-                dot={{ fill: "#8B0000" }}
+                dot={{ fill: "#CC0000" }}
               />
             </LineChart>
           </ResponsiveContainer>
