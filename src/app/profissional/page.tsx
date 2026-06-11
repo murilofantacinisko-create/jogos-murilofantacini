@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Jogo } from "@/types/jogo";
+import { getTeamLogo } from "@/lib/teamLogos";
 
 const PAGE_SIZE = 15;
 
@@ -47,6 +48,50 @@ function resultadoCor(resultado: string) {
     default:
       return "bg-corinthians-red/30 text-red-400 border-corinthians-red/50";
   }
+}
+
+function TeamLogo({ team, size }: { team: string; size: number }) {
+  const [logo, setLogo] = useState<string | null | undefined>(
+    team === "Corinthians" ? "/sccp.png" : undefined
+  );
+
+  useEffect(() => {
+    if (team === "Corinthians") {
+      setLogo("/sccp.png");
+      return;
+    }
+
+    let cancelled = false;
+    setLogo(undefined);
+    getTeamLogo(team).then((url) => {
+      if (!cancelled) setLogo(url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [team]);
+
+  if (logo === undefined || logo === null) {
+    return (
+      <span
+        className="inline-block shrink-0 rounded-full bg-secondary"
+        style={{ width: size, height: size }}
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={logo}
+      alt={`Escudo ${team}`}
+      width={size}
+      height={size}
+      className="shrink-0 rounded-full object-contain"
+      style={{ width: size, height: size }}
+    />
+  );
 }
 
 function SummaryCard({
@@ -408,7 +453,12 @@ export default function ProfissionalPage() {
                       <td className="px-4 py-3 whitespace-nowrap">
                         {formatData(j.data)}
                       </td>
-                      <td className="px-4 py-3">{j.adversario}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <TeamLogo team={j.adversario} size={24} />
+                          {j.adversario}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 font-semibold">
                         {j.gm} x {j.gs}
                       </td>
@@ -521,15 +571,21 @@ export default function ProfissionalPage() {
                 {error && <p className="text-sm text-corinthians-red">{error}</p>}
 
                 <div className="flex items-center justify-center gap-4 rounded-lg bg-secondary/40 py-4">
-                  <span className="truncate text-sm font-semibold">
-                    Corinthians
-                  </span>
+                  <div className="flex flex-col items-center gap-1">
+                    <TeamLogo team="Corinthians" size={48} />
+                    <span className="truncate text-sm font-semibold">
+                      Corinthians
+                    </span>
+                  </div>
                   <span className="text-3xl font-extrabold">
                     {jogo.gm} x {jogo.gs}
                   </span>
-                  <span className="truncate text-sm font-semibold">
-                    {jogo.adversario}
-                  </span>
+                  <div className="flex flex-col items-center gap-1">
+                    <TeamLogo team={jogo.adversario} size={48} />
+                    <span className="truncate text-sm font-semibold">
+                      {jogo.adversario}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
