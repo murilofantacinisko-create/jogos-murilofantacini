@@ -355,14 +355,14 @@ export default function DashboardPage() {
 
   return (
     <div
-      className="relative"
+      className="relative -m-8 min-h-screen p-8"
       style={
         visao === "outros"
           ? {
               backgroundImage: "url('/estadio.jpeg')",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              backgroundAttachment: "fixed",
+              backgroundColor: "transparent",
             }
           : {}
       }
