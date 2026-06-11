@@ -1,6 +1,6 @@
 "use client";
 
-import { jogosProfissional } from "@/data/jogos";
+import { gols } from "@/data/jogos";
 import {
   Bar,
   BarChart,
@@ -11,23 +11,32 @@ import {
   YAxis,
 } from "recharts";
 
+const FAIXAS = ["0–15", "16–30", "31–45", "46–60", "61–75", "76–89", "90+"];
+
 export default function GolsPage() {
   const golsPorJogador = new Map<string, number>();
 
-  for (const jogo of jogosProfissional) {
-    for (const gol of jogo.gols ?? []) {
-      golsPorJogador.set(
-        gol.jogador,
-        (golsPorJogador.get(gol.jogador) ?? 0) + 1
-      );
-    }
+  for (const gol of gols) {
+    golsPorJogador.set(gol.Atleta, (golsPorJogador.get(gol.Atleta) ?? 0) + 1);
   }
 
   const artilharia = Array.from(golsPorJogador.entries())
-    .map(([jogador, gols]) => ({ jogador, gols }))
-    .sort((a, b) => b.gols - a.gols);
+    .map(([jogador, quantidade]) => ({ jogador, gols: quantidade }))
+    .sort((a, b) => b.gols - a.gols)
+    .slice(0, 15);
 
-  const totalGols = artilharia.reduce((acc, a) => acc + a.gols, 0);
+  const golsPorFaixa = new Map<string, number>();
+  for (const gol of gols) {
+    const faixa = gol["Faixa Minuto"];
+    golsPorFaixa.set(faixa, (golsPorFaixa.get(faixa) ?? 0) + 1);
+  }
+
+  const distribuicaoMinutos = FAIXAS.map((faixa) => ({
+    faixa,
+    gols: golsPorFaixa.get(faixa) ?? 0,
+  }));
+
+  const totalGols = gols.length;
 
   return (
     <div className="flex flex-col gap-8">
@@ -46,13 +55,7 @@ export default function GolsPage() {
       <div className="rounded-lg border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-semibold">Artilharia</h2>
         {artilharia.length === 0 ? (
-          <p className="text-muted-foreground">
-            Nenhum gol registrado ainda. Adicione jogos com gols em{" "}
-            <code className="rounded bg-secondary px-1 py-0.5">
-              src/data/jogos.ts
-            </code>
-            .
-          </p>
+          <p className="text-muted-foreground">Nenhum gol registrado ainda.</p>
         ) : (
           <div className="h-96 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -62,7 +65,7 @@ export default function GolsPage() {
                 <YAxis
                   type="category"
                   dataKey="jogador"
-                  width={120}
+                  width={140}
                   stroke="#a1a1aa"
                 />
                 <Tooltip
@@ -76,6 +79,26 @@ export default function GolsPage() {
             </ResponsiveContainer>
           </div>
         )}
+      </div>
+
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-xl font-semibold">Gols por Faixa de Minuto</h2>
+        <div className="h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={distribuicaoMinutos}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+              <XAxis dataKey="faixa" stroke="#a1a1aa" />
+              <YAxis allowDecimals={false} stroke="#a1a1aa" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#171717",
+                  border: "1px solid #262626",
+                }}
+              />
+              <Bar dataKey="gols" fill="#8B0000" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

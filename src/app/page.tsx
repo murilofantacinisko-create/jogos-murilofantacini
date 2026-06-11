@@ -1,5 +1,6 @@
-import { jogosProfissional, jogosOutros } from "@/data/jogos";
-import { Trophy, Goal, CalendarDays, Shield } from "lucide-react";
+import { jogadosProfissional } from "@/data/jogos";
+import { Trophy, Goal, CalendarDays, Award } from "lucide-react";
+import { ClientCharts } from "./client-charts";
 
 function StatCard({
   label,
@@ -24,33 +25,38 @@ function StatCard({
 }
 
 export default function DashboardPage() {
-  const totalJogos = jogosProfissional.length;
+  const totalJogos = jogadosProfissional.length;
 
-  const vitorias = jogosProfissional.filter(
-    (j) => j.placarCorinthians > j.placarAdversario
+  const vitorias = jogadosProfissional.filter(
+    (j) => j.RESULTADO === "Vitória"
   ).length;
-  const empates = jogosProfissional.filter(
-    (j) => j.placarCorinthians === j.placarAdversario
+  const empates = jogadosProfissional.filter(
+    (j) => j.RESULTADO === "Empate"
   ).length;
-  const derrotas = jogosProfissional.filter(
-    (j) => j.placarCorinthians < j.placarAdversario
+  const derrotas = jogadosProfissional.filter(
+    (j) => j.RESULTADO === "Derrota"
   ).length;
 
-  const aproveitamento =
-    totalJogos > 0
-      ? Math.round(((vitorias * 3 + empates) / (totalJogos * 3)) * 100)
-      : 0;
+  const golsVistos = jogadosProfissional.reduce((acc, j) => acc + j.GM, 0);
 
-  const totalGols = jogosProfissional.reduce(
-    (acc, j) => acc + j.placarCorinthians,
-    0
-  );
+  const titulos = jogadosProfissional.filter(
+    (j) => j.STATUS === "Campeão"
+  ).length;
 
-  const totalOutrosJogos = jogosOutros.length;
+  const jogosPorAno = Array.from(
+    jogadosProfissional.reduce((map, j) => {
+      map.set(j.ANO, (map.get(j.ANO) ?? 0) + 1);
+      return map;
+    }, new Map<string, number>())
+  )
+    .map(([ano, jogos]) => ({ ano, jogos }))
+    .sort((a, b) => a.ano.localeCompare(b.ano));
 
-  const ultimosJogos = [...jogosProfissional]
-    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
-    .slice(0, 5);
+  const distribuicao = [
+    { name: "Vitórias", value: vitorias, color: "#22c55e" },
+    { name: "Empates", value: empates, color: "#a1a1aa" },
+    { name: "Derrotas", value: derrotas, color: "#8B0000" },
+  ];
 
   return (
     <div className="flex flex-col gap-8">
@@ -64,67 +70,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Jogos Acompanhados" value={totalJogos} icon={CalendarDays} />
         <StatCard label="Vitórias" value={vitorias} icon={Trophy} />
-        <StatCard label="Aproveitamento" value={`${aproveitamento}%`} icon={Shield} />
-        <StatCard label="Gols do Corinthians" value={totalGols} icon={Goal} />
+        <StatCard label="Gols Vistos" value={golsVistos} icon={Goal} />
+        <StatCard label="Títulos Presenciados" value={titulos} icon={Award} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-card p-6">
-          <p className="text-sm text-muted-foreground">Vitórias</p>
-          <p className="text-2xl font-bold text-corinthians-white">{vitorias}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-6">
-          <p className="text-sm text-muted-foreground">Empates</p>
-          <p className="text-2xl font-bold text-corinthians-white">{empates}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-6">
-          <p className="text-sm text-muted-foreground">Derrotas</p>
-          <p className="text-2xl font-bold text-corinthians-white">{derrotas}</p>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-semibold">Últimos Jogos</h2>
-        {ultimosJogos.length === 0 ? (
-          <p className="text-muted-foreground">
-            Nenhum jogo registrado ainda. Adicione jogos em{" "}
-            <code className="rounded bg-secondary px-1 py-0.5">
-              src/data/jogos.ts
-            </code>
-            .
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-3">
-            {ultimosJogos.map((jogo) => (
-              <li
-                key={jogo.id}
-                className="flex items-center justify-between rounded-md border border-border p-3"
-              >
-                <div>
-                  <p className="font-medium">
-                    Corinthians {jogo.mandante ? "x" : "vs"} {jogo.adversario}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {jogo.competicao} • {jogo.data}
-                  </p>
-                </div>
-                <p className="text-lg font-bold">
-                  {jogo.placarCorinthians} - {jogo.placarAdversario}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="rounded-lg border border-border bg-card p-6">
-        <h2 className="mb-2 text-xl font-semibold">Outros Jogos</h2>
-        <p className="text-muted-foreground">
-          {totalOutrosJogos === 0
-            ? "Nenhum outro jogo registrado ainda."
-            : `${totalOutrosJogos} jogo(s) registrado(s).`}
-        </p>
-      </div>
+      <ClientCharts jogosPorAno={jogosPorAno} distribuicao={distribuicao} />
     </div>
   );
 }
