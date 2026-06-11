@@ -13,6 +13,7 @@ import {
 import { ClientCharts } from "./client-charts";
 import { Jogo } from "@/types/jogo";
 import { cn } from "@/lib/utils";
+import { getTeamLogo } from "@/lib/teamLogos";
 
 const FAIXAS = ["0–15", "16–30", "31–45", "46–60", "61–75", "76–89", "90+"];
 
@@ -76,6 +77,50 @@ function SccpCrest() {
       alt="SCCP"
       style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
       className="shrink-0"
+    />
+  );
+}
+
+function TeamLogo({ team, size }: { team: string; size: number }) {
+  const [logo, setLogo] = useState<string | null | undefined>(
+    team === "Corinthians" ? "/sccp.png" : undefined
+  );
+
+  useEffect(() => {
+    if (team === "Corinthians") {
+      setLogo("/sccp.png");
+      return;
+    }
+
+    let cancelled = false;
+    setLogo(undefined);
+    getTeamLogo(team).then((url) => {
+      if (!cancelled) setLogo(url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [team]);
+
+  if (logo === undefined || logo === null) {
+    return (
+      <span
+        className="inline-block shrink-0 rounded-full bg-secondary"
+        style={{ width: size, height: size }}
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={logo}
+      alt={`Escudo ${team}`}
+      width={size}
+      height={size}
+      className="shrink-0 rounded-full object-contain"
+      style={{ width: size, height: size }}
     />
   );
 }
@@ -719,7 +764,10 @@ export default function DashboardPage() {
                     key={a.adversario}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span>{a.adversario}</span>
+                    <span className="flex items-center gap-2">
+                      <TeamLogo team={a.adversario} size={24} />
+                      {a.adversario}
+                    </span>
                     <span className="text-muted-foreground">
                       {a.jogos} jogo{a.jogos !== 1 ? "s" : ""} •{" "}
                       {a.aproveitamento.toFixed(1)}%
