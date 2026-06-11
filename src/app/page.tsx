@@ -72,7 +72,7 @@ function HighlightCard({
 function SccpCrest() {
   return (
     <img
-      src="/corinthians.png"
+      src="/sccp.png"
       alt="SCCP"
       style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
       className="shrink-0"
