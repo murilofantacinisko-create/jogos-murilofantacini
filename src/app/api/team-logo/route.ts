@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const res = await fetch(
       `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(team)}`
     );
+    if (!res.ok) return Response.json({ logo: null });
     const data = await res.json();
     const logo = data?.teams?.[0]?.strTeamBadge ?? null;
     return Response.json({ logo });
