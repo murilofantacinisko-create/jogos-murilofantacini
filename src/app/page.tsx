@@ -394,7 +394,7 @@ export default function DashboardPage() {
           left: 0,
           width: "100vw",
           height: "100vh",
-          backgroundColor: "rgba(0,0,0,0.75)",
+          backgroundColor: "rgba(0,0,0,0.45)",
           zIndex: 0,
           pointerEvents: "none",
           display: visao === "outros" ? "block" : "none",
