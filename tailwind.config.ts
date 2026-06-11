@@ -57,6 +57,11 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        corinthians: {
+          black: "#000000",
+          white: "#FFFFFF",
+          red: "#8B0000",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
