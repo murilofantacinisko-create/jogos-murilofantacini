@@ -69,16 +69,14 @@ function HighlightCard({
   );
 }
 
-function SccpCrest({ size = "h-12 w-12" }: { size?: string }) {
+function SccpCrest() {
   return (
-    <div
-      className={cn(
-        "flex shrink-0 items-center justify-center rounded-full border-2 border-corinthians-red bg-black text-xs font-extrabold tracking-wider text-white",
-        size
-      )}
-    >
-      SCCP
-    </div>
+    <img
+      src="/corinthians.png.png"
+      alt="SCCP"
+      style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }}
+      className="shrink-0"
+    />
   );
 }
 
@@ -359,7 +357,20 @@ export default function DashboardPage() {
   })();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="relative">
+      {visao === "profissional" && (
+        <div
+          className="pointer-events-none fixed left-0 top-0 z-0 h-full w-full"
+          style={{
+            backgroundImage: "url('/arena.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.06,
+          }}
+        />
+      )}
+
+      <div className="relative z-10 flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold sm:text-4xl">
           Meu Histórico <span className="text-corinthians-red">Alvinegro</span>
@@ -372,7 +383,7 @@ export default function DashboardPage() {
       {visao === "profissional" && totalJogos > 0 && (
         <div className="flex flex-col gap-4 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <SccpCrest size="h-16 w-16" />
+            <SccpCrest />
             <div>
               <h2 className="text-2xl font-bold">Corinthians Profissional</h2>
               <p className="text-sm text-muted-foreground">
@@ -730,6 +741,7 @@ export default function DashboardPage() {
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
