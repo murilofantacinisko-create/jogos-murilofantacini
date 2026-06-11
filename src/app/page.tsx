@@ -286,8 +286,7 @@ export default function DashboardPage() {
       jogos: count,
       aproveitamento: (pontos / (count * 3)) * 100,
     }))
-    .sort((a, b) => b.jogos - a.jogos)
-    .slice(0, 5);
+    .sort((a, b) => b.jogos - a.jogos);
 
   const topArtilheiros = Array.from(
     jogosFiltrados
@@ -298,8 +297,7 @@ export default function DashboardPage() {
       }, new Map<string, number>())
   )
     .map(([atleta, gols]) => ({ atleta, gols }))
-    .sort((a, b) => b.gols - a.gols)
-    .slice(0, 10);
+    .sort((a, b) => b.gols - a.gols);
 
   const topEstadios = Array.from(
     jogosFiltrados.reduce((map, j) => {
@@ -308,8 +306,7 @@ export default function DashboardPage() {
     }, new Map<string, number>())
   )
     .map(([estadio, jogos]) => ({ estadio, jogos }))
-    .sort((a, b) => b.jogos - a.jogos)
-    .slice(0, 5);
+    .sort((a, b) => b.jogos - a.jogos);
 
   const estadioMaisVisitado = topEstadios[0] ?? null;
 
@@ -689,7 +686,7 @@ export default function DashboardPage() {
               <h2 className="mb-3 text-sm font-semibold">
                 Adversários Mais Frequentes
               </h2>
-              <ul className="flex flex-col gap-2 text-sm">
+              <ul className="scrollbar-thin flex max-h-[200px] flex-col gap-2 overflow-y-auto text-sm">
                 {topAdversarios.map((a) => (
                   <li
                     key={a.adversario}
@@ -709,7 +706,7 @@ export default function DashboardPage() {
               <h2 className="mb-3 text-sm font-semibold">
                 Artilheiros Mais Vistos
               </h2>
-              <ul className="flex flex-col gap-2 text-sm">
+              <ul className="scrollbar-thin flex max-h-[200px] flex-col gap-2 overflow-y-auto text-sm">
                 {topArtilheiros.map((a) => (
                   <li
                     key={a.atleta}
@@ -729,7 +726,7 @@ export default function DashboardPage() {
                 <MapPin className="h-4 w-4" />
                 Estádios Mais Frequentados
               </h2>
-              <ul className="flex flex-col gap-2 text-sm">
+              <ul className="scrollbar-thin flex max-h-[200px] flex-col gap-2 overflow-y-auto text-sm">
                 {topEstadios.map((e) => (
                   <li
                     key={e.estadio}
