@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Jogo } from "@/types/jogo";
 
@@ -17,7 +18,10 @@ function resultadoCor(resultado: string) {
 
 function JogoCard({ jogo }: { jogo: Jogo }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-6">
+    <Link
+      href={`/outros/${jogo.id}`}
+      className="flex flex-col gap-2 rounded-lg border border-border bg-card p-6 transition-colors hover:bg-secondary"
+    >
       <p className="text-sm text-muted-foreground">
         {jogo.data} • {jogo.campeonato}
       </p>
@@ -44,7 +48,7 @@ function JogoCard({ jogo }: { jogo: Jogo }) {
           Público: {jogo.publico.toLocaleString("pt-BR")}
         </p>
       )}
-    </div>
+    </Link>
   );
 }
 
