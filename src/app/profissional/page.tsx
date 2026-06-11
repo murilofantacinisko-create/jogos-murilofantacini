@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Jogo } from "@/types/jogo";
 
@@ -16,6 +17,7 @@ function resultadoCor(resultado: string) {
 }
 
 export default function ProfissionalPage() {
+  const router = useRouter();
   const [jogadosProfissional, setJogadosProfissional] = useState<Jogo[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -113,7 +115,11 @@ export default function ProfissionalPage() {
           </thead>
           <tbody>
             {jogos.map((jogo) => (
-              <tr key={jogo.id} className="border-b border-border last:border-0">
+              <tr
+                key={jogo.id}
+                onClick={() => router.push(`/profissional/${jogo.id}`)}
+                className="cursor-pointer border-b border-border last:border-0 hover:bg-secondary/50"
+              >
                 <td className="px-4 py-3 whitespace-nowrap">{jogo.data}</td>
                 <td className="px-4 py-3">{jogo.adversario}</td>
                 <td className="px-4 py-3 font-semibold">

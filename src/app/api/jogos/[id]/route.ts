@@ -68,18 +68,14 @@ export async function PUT(
       pontos,
       ano,
       categoria,
-      ...(gols
-        ? {
-            gols: {
-              deleteMany: {},
-              create: gols.map((gol: { atleta: string; minuto: number; faixaMinuto: string }) => ({
-                atleta: gol.atleta,
-                minuto: gol.minuto,
-                faixaMinuto: gol.faixaMinuto,
-              })),
-            },
-          }
-        : {}),
+      gols: {
+        deleteMany: {},
+        create: (gols ?? []).map((gol: { atleta: string; minuto: number; faixaMinuto: string }) => ({
+          atleta: gol.atleta,
+          minuto: gol.minuto,
+          faixaMinuto: gol.faixaMinuto,
+        })),
+      },
     },
     include: { gols: true },
   });
