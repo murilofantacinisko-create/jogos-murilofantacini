@@ -72,7 +72,7 @@ function HighlightCard({
 function SccpCrest() {
   return (
     <img
-      src="/corinthians.png.png"
+      src="/corinthians.png"
       alt="SCCP"
       style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
       className="shrink-0"
@@ -365,7 +365,7 @@ export default function DashboardPage() {
           backgroundImage: `url('/arena.jpg')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.3,
+          opacity: 0.07,
           zIndex: 0,
           pointerEvents: "none",
           display: visao === "profissional" ? "block" : "none",

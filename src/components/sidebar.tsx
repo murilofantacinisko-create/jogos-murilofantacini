@@ -47,7 +47,7 @@ export function Sidebar() {
 
       <div className="flex items-center gap-3 border-t border-border px-6 py-4">
         <img
-          src="/corinthians.png.png"
+          src="/corinthians.png"
           alt="SCCP"
           style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
         />
