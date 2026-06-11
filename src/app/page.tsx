@@ -354,7 +354,19 @@ export default function DashboardPage() {
   })();
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      style={
+        visao === "outros"
+          ? {
+              backgroundImage: "url('/estadio.jpeg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundAttachment: "fixed",
+            }
+          : {}
+      }
+    >
       <div
         style={{
           position: "fixed",
@@ -372,34 +384,17 @@ export default function DashboardPage() {
         }}
       />
 
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          backgroundImage: `url('/estadio.jpeg')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: 0,
-          pointerEvents: "none",
-          display: visao === "outros" ? "block" : "none",
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          backgroundColor: "rgba(0,0,0,0.45)",
-          zIndex: 0,
-          pointerEvents: "none",
-          display: visao === "outros" ? "block" : "none",
-        }}
-      />
+      {visao === "outros" && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 0,
+            pointerEvents: "none",
+            background: "rgba(0,0,0,0.5)",
+          }}
+        />
+      )}
 
       <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-6">
       <div>
