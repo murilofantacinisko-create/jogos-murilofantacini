@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   description: "Acompanhamento pessoal de jogos do Corinthians",
 };
 
+// Layout raiz: sidebar fixa + área de conteúdo rolável
 export default function RootLayout({
   children,
 }: Readonly<{
