@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Trophy, Target, Grid2x2, PlusCircle } from "lucide-react";
+import { LayoutDashboard, Trophy, Grid2x2, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/profissional", label: "Profissional", icon: Trophy },
-  { href: "/gols", label: "Gols", icon: Target },
   { href: "/outros", label: "Outros Jogos", icon: Grid2x2 },
   { href: "/admin", label: "Adicionar Jogo", icon: PlusCircle },
 ];
@@ -23,7 +22,7 @@ export function Sidebar() {
           Meus Jogos
         </span>
       </div>
-      <nav className="flex flex-col gap-1 p-4">
+      <nav className="flex flex-1 flex-col gap-1 p-4">
         {links.map(({ href, label, icon: Icon }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -45,6 +44,17 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <div className="flex items-center gap-3 border-t border-border px-6 py-4">
+        <img
+          src="/corinthians.png"
+          alt="SCCP"
+          style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
+        />
+        <span className="text-sm font-bold text-corinthians-red">
+          Vai, Corinthians!
+        </span>
+      </div>
     </aside>
   );
 }
