@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Jogo } from "@/types/jogo";
+import {
+  OutroEsporte,
+  PlacarPontos,
+  PlacarTenis,
+  PlacarVolei,
+} from "@/types/esporte";
 
 function resultadoCor(resultado: string) {
   switch (resultado) {
@@ -14,6 +20,132 @@ function resultadoCor(resultado: string) {
     default:
       return "bg-corinthians-red/30 text-red-400 border-corinthians-red/50";
   }
+}
+
+function esporteCor(esporte: string) {
+  switch (esporte) {
+    case "Vôlei":
+      return "bg-blue-700/30 text-blue-400 border-blue-700/50";
+    case "Basquete":
+      return "bg-orange-700/30 text-orange-400 border-orange-700/50";
+    case "Futebol Americano":
+      return "bg-purple-700/30 text-purple-400 border-purple-700/50";
+    case "Tênis":
+      return "bg-green-700/30 text-green-400 border-green-700/50";
+    default:
+      return "bg-secondary text-foreground border-border";
+  }
+}
+
+function PlacarEsporte({ esporte, placarJson }: { esporte: string; placarJson: string }) {
+  let placar;
+  try {
+    placar = JSON.parse(placarJson);
+  } catch {
+    return null;
+  }
+
+  if (esporte === "Tênis") {
+    const { melhorDe, sets } = placar as PlacarTenis;
+    return (
+      <div className="flex flex-col gap-1">
+        <p className="text-sm text-muted-foreground">Melhor de {melhorDe}</p>
+        <p className="text-lg font-bold">
+          {sets.map((set, i) => (
+            <span key={i}>
+              {i > 0 && ", "}
+              {set.a}-{set.b}
+            </span>
+          ))}
+        </p>
+      </div>
+    );
+  }
+
+  if (esporte === "Vôlei") {
+    const { setsA, setsB, sets } = placar as PlacarVolei;
+    return (
+      <div className="flex flex-col gap-1">
+        <p className="text-2xl font-bold">
+          {setsA} - {setsB}
+        </p>
+        {sets.length > 0 && (
+          <p className="text-sm text-muted-foreground">
+            {sets.map((set, i) => (
+              <span key={i}>
+                {i > 0 && ", "}
+                {set.a}-{set.b}
+              </span>
+            ))}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  const { pontosA, pontosB } = placar as PlacarPontos;
+  return (
+    <p className="text-2xl font-bold">
+      {pontosA} - {pontosB}
+    </p>
+  );
+}
+
+function EsporteCard({ evento }: { evento: OutroEsporte }) {
+  return (
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-6 transition-colors hover:bg-secondary">
+      <div className="flex items-center justify-between">
+        <span
+          className={cn(
+            "w-fit rounded-full border px-2 py-1 text-xs font-bold",
+            esporteCor(evento.esporte)
+          )}
+        >
+          {evento.esporte}
+        </span>
+        <p className="text-sm text-muted-foreground">{evento.data}</p>
+      </div>
+
+      <p className="text-lg font-semibold">
+        {evento.timeA} x {evento.timeB}
+      </p>
+
+      <p className="text-sm text-muted-foreground">Vencedor: {evento.vencedor}</p>
+
+      <PlacarEsporte esporte={evento.esporte} placarJson={evento.placarJson} />
+
+      <p className="text-sm text-muted-foreground">{evento.campeonato}</p>
+      <p className="text-sm text-muted-foreground">
+        {evento.estadio} • {evento.localizacao}
+      </p>
+      {evento.info && <p className="text-sm text-muted-foreground">{evento.info}</p>}
+    </div>
+  );
+}
+
+function EsportesGrid({ eventos }: { eventos: OutroEsporte[] }) {
+  const ordenados = [...eventos].sort(
+    (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-xl font-semibold">Outros Esportes</h2>
+      {ordenados.length === 0 ? (
+        <div className="rounded-lg border border-border bg-card p-6">
+          <p className="text-muted-foreground">
+            Nenhum evento registrado ainda. Adicione em /admin.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {ordenados.map((evento) => (
+            <EsporteCard key={evento.id} evento={evento} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function JogoCard({ jogo }: { jogo: Jogo }) {
@@ -80,16 +212,19 @@ function JogosGrid({ titulo, jogos }: { titulo: string; jogos: Jogo[] }) {
 export default function OutrosPage() {
   const [outrosCorinthians, setOutrosCorinthians] = useState<Jogo[]>([]);
   const [outrosJogos, setOutrosJogos] = useState<Jogo[]>([]);
+  const [outrosEsportes, setOutrosEsportes] = useState<OutroEsporte[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch("/api/jogos?categoria=outros-corinthians").then((res) => res.json()),
       fetch("/api/jogos?categoria=outros-jogos").then((res) => res.json()),
+      fetch("/api/esportes").then((res) => res.json()),
     ])
-      .then(([corinthians, jogos]) => {
+      .then(([corinthians, jogos, esportes]) => {
         setOutrosCorinthians(corinthians);
         setOutrosJogos(jogos);
+        setOutrosEsportes(esportes);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -126,6 +261,7 @@ export default function OutrosPage() {
           <>
             <JogosGrid titulo="Outros Corinthians" jogos={outrosCorinthians} />
             <JogosGrid titulo="Outros Jogos" jogos={outrosJogos} />
+            <EsportesGrid eventos={outrosEsportes} />
           </>
         )}
       </div>
