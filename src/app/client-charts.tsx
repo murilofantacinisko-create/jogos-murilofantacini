@@ -215,3 +215,76 @@ export function ClientCharts({
     </div>
   );
 }
+
+export function EsportesCharts({
+  eventosPorAno,
+  eventosPorEsporte,
+}: {
+  eventosPorAno: { ano: string; eventos: number }[];
+  eventosPorEsporte: { name: string; value: number; color: string }[];
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="rounded-lg border border-border bg-card p-4">
+        <h2 className="mb-2 text-sm font-semibold">Eventos por Ano</h2>
+        <div className="h-56 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={eventosPorAno}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+              <XAxis dataKey="ano" stroke="#a1a1aa" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} stroke="#a1a1aa" tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey="eventos" fill="#CC0000" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-border bg-card p-4">
+        <h2 className="mb-2 text-sm font-semibold">Eventos por Esporte</h2>
+        <div className="flex h-56 w-full items-center gap-2">
+          <div className="h-full w-3/5">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={eventosPorEsporte}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={2}
+                >
+                  {eventosPorEsporte.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex w-2/5 flex-col gap-2">
+            {eventosPorEsporte.map((entry) => {
+              const total = eventosPorEsporte.reduce((acc, d) => acc + d.value, 0);
+              const pct = total > 0 ? (entry.value / total) * 100 : 0;
+              return (
+                <div key={entry.name} className="flex items-center gap-2 text-xs">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className="flex-1 truncate text-muted-foreground">
+                    {entry.name}
+                  </span>
+                  <span className="font-semibold">{entry.value}</span>
+                  <span className="w-12 text-right text-muted-foreground">
+                    {pct.toFixed(1)}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

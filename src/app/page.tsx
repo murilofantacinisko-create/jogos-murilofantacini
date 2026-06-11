@@ -10,8 +10,9 @@ import {
   MapPin,
   Award,
 } from "lucide-react";
-import { ClientCharts } from "./client-charts";
+import { ClientCharts, EsportesCharts } from "./client-charts";
 import { Jogo } from "@/types/jogo";
+import { OutroEsporte } from "@/types/esporte";
 import { cn } from "@/lib/utils";
 import { getTeamLogo } from "@/lib/teamLogos";
 
@@ -147,11 +148,36 @@ function resultadoLetra(resultado: string): string {
   }
 }
 
-type Visao = "profissional" | "outros";
+type Visao = "profissional" | "outros" | "esportes";
+
+const ESPORTES_TIPOS = ["Vôlei", "Basquete", "Futebol Americano", "Tênis"];
+
+const ESPORTE_CORES: Record<string, string> = {
+  "Vôlei": "#3b82f6",
+  Basquete: "#f97316",
+  "Futebol Americano": "#a855f7",
+  "Tênis": "#22c55e",
+};
+
+function esporteCor(esporte: string) {
+  switch (esporte) {
+    case "Vôlei":
+      return "bg-blue-700/30 text-blue-400 border-blue-700/50";
+    case "Basquete":
+      return "bg-orange-700/30 text-orange-400 border-orange-700/50";
+    case "Futebol Americano":
+      return "bg-purple-700/30 text-purple-400 border-purple-700/50";
+    case "Tênis":
+      return "bg-green-700/30 text-green-400 border-green-700/50";
+    default:
+      return "bg-secondary text-foreground border-border";
+  }
+}
 
 export default function DashboardPage() {
   const [jogosProfissional, setJogosProfissional] = useState<Jogo[]>([]);
   const [jogosOutros, setJogosOutros] = useState<Jogo[]>([]);
+  const [outrosEsportes, setOutrosEsportes] = useState<OutroEsporte[]>([]);
   const [loading, setLoading] = useState(true);
   const [visao, setVisao] = useState<Visao>("profissional");
   const [ano, setAno] = useState("Todos");
@@ -162,10 +188,12 @@ export default function DashboardPage() {
       fetch("/api/jogos?categoria=profissional").then((res) => res.json()),
       fetch("/api/jogos?categoria=outros-corinthians").then((res) => res.json()),
       fetch("/api/jogos?categoria=outros-jogos").then((res) => res.json()),
+      fetch("/api/esportes").then((res) => res.json()),
     ])
-      .then(([profissional, outrosCorinthians, outrosJogos]) => {
+      .then(([profissional, outrosCorinthians, outrosJogos, esportes]) => {
         setJogosProfissional(profissional);
         setJogosOutros([...outrosCorinthians, ...outrosJogos]);
+        setOutrosEsportes(esportes);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -244,6 +272,34 @@ export default function DashboardPage() {
     fase: label,
     jogos: jogosFiltrados.filter((j) => match(j.fase)).length,
   }));
+
+  const totalEventosEsportes = outrosEsportes.length;
+
+  const eventosPorTipo = ESPORTES_TIPOS.map((tipo) => ({
+    tipo,
+    total: outrosEsportes.filter((e) => e.esporte === tipo).length,
+  }));
+
+  const eventosPorAnoEsportes = Array.from(
+    outrosEsportes.reduce((map, e) => {
+      const anoEvento = e.data.split("-")[0];
+      map.set(anoEvento, (map.get(anoEvento) ?? 0) + 1);
+      return map;
+    }, new Map<string, number>())
+  )
+    .map(([anoEvento, total]) => ({ ano: anoEvento, eventos: total }))
+    .sort((a, b) => a.ano.localeCompare(b.ano));
+
+  const eventosPorEsporte = ESPORTES_TIPOS.map((tipo) => ({
+    name: tipo,
+    value: outrosEsportes.filter((e) => e.esporte === tipo).length,
+    color: ESPORTE_CORES[tipo],
+  })).filter((e) => e.value > 0);
+
+  const ultimosCincoEsportes = [...outrosEsportes]
+    .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    .slice(-5)
+    .reverse();
 
   const jogosPorAno = Array.from(
     jogosFiltrados.reduce((map, j) => {
@@ -430,7 +486,7 @@ export default function DashboardPage() {
           opacity: 0.07,
           zIndex: 0,
           pointerEvents: "none",
-          display: visao === "outros" ? "block" : "none",
+          display: visao !== "profissional" ? "block" : "none",
         }}
       />
 
@@ -441,16 +497,22 @@ export default function DashboardPage() {
             <>
               Meu Histórico <span className="text-corinthians-red">Alvinegro</span>
             </>
-          ) : (
+          ) : visao === "outros" ? (
             <>
               Meu Histórico <span className="text-corinthians-red">Geral</span>
+            </>
+          ) : (
+            <>
+              Outros <span className="text-corinthians-red">Esportes</span>
             </>
           )}
         </h1>
         <p className="text-muted-foreground">
           {visao === "profissional"
             ? "Acompanhe todos os jogos do Corinthians que você já esteve presente."
-            : "Acompanhe todos os jogos que você já esteve presente."}
+            : visao === "outros"
+            ? "Acompanhe todos os jogos que você já esteve presente."
+            : "Acompanhe outros eventos esportivos que você já acompanhou."}
         </p>
       </div>
 
@@ -525,37 +587,51 @@ export default function DashboardPage() {
         >
           Outros Jogos
         </button>
+        <button
+          type="button"
+          onClick={() => selecionarVisao("esportes")}
+          className={cn(
+            "rounded-md px-4 py-2 text-sm font-medium transition-colors",
+            visao === "esportes"
+              ? "bg-corinthians-red text-white"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Outros Esportes
+        </button>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <select
-          value={ano}
-          onChange={(e) => setAno(e.target.value)}
-          className="rounded-md border border-border bg-card px-3 py-2 text-sm"
-        >
-          <option value="Todos">Todos os Anos</option>
-          {anos.map((a) => (
-            <option key={a} value={a}>
-              {a}
-            </option>
-          ))}
-        </select>
+      {visao !== "esportes" && (
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <select
+            value={ano}
+            onChange={(e) => setAno(e.target.value)}
+            className="rounded-md border border-border bg-card px-3 py-2 text-sm"
+          >
+            <option value="Todos">Todos os Anos</option>
+            {anos.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
+          </select>
 
-        <select
-          value={campeonato}
-          onChange={(e) => setCampeonato(e.target.value)}
-          className="rounded-md border border-border bg-card px-3 py-2 text-sm"
-        >
-          <option value="Todos">Todos os Campeonatos</option>
-          {campeonatos.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </div>
+          <select
+            value={campeonato}
+            onChange={(e) => setCampeonato(e.target.value)}
+            className="rounded-md border border-border bg-card px-3 py-2 text-sm"
+          >
+            <option value="Todos">Todos os Campeonatos</option>
+            {campeonatos.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
-      {loading ? (
+      {visao !== "esportes" && (loading ? (
         <p className="text-muted-foreground">Carregando...</p>
       ) : totalJogos === 0 ? (
         <div className="rounded-lg border border-border bg-card p-6">
@@ -817,7 +893,71 @@ export default function DashboardPage() {
             </div>
           </div>
         </>
-      )}
+      ))}
+
+      {visao === "esportes" && (loading ? (
+        <p className="text-muted-foreground">Carregando...</p>
+      ) : totalEventosEsportes === 0 ? (
+        <div className="rounded-lg border border-border bg-card p-6">
+          <p className="text-muted-foreground">
+            Nenhum evento registrado ainda. Adicione em /admin.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Total de Eventos" value={totalEventosEsportes} icon={Trophy} />
+            <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4 sm:col-span-3">
+              <p className="text-sm text-muted-foreground">Por Modalidade</p>
+              <div className="flex flex-wrap gap-2">
+                {eventosPorTipo.map((e) => (
+                  <span
+                    key={e.tipo}
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-xs font-bold",
+                      esporteCor(e.tipo)
+                    )}
+                  >
+                    {e.tipo}: {e.total}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <EsportesCharts eventosPorAno={eventosPorAnoEsportes} eventosPorEsporte={eventosPorEsporte} />
+
+          <div className="rounded-lg border border-border bg-card p-4">
+            <h2 className="mb-3 text-base font-semibold">Últimos 5 Eventos</h2>
+            <ul className="flex flex-col gap-2">
+              {ultimosCincoEsportes.map((e) => (
+                <li
+                  key={e.id}
+                  className="flex flex-col gap-2 rounded-md border border-border p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        "w-fit rounded-full border px-2 py-1 text-xs font-bold",
+                        esporteCor(e.esporte)
+                      )}
+                    >
+                      {e.esporte}
+                    </span>
+                    <span className="font-semibold">
+                      {e.timeA} x {e.timeB}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <span>Vencedor: {e.vencedor}</span>
+                    <span>{formatData(e.data)}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      ))}
       </div>
     </div>
   );
