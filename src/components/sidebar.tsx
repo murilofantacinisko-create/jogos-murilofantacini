@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Trophy, Target, Grid2x2 } from "lucide-react";
+import { LayoutDashboard, Trophy, Target, Grid2x2, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { href: "/profissional", label: "Profissional", icon: Trophy },
   { href: "/gols", label: "Gols", icon: Target },
   { href: "/outros", label: "Outros Jogos", icon: Grid2x2 },
+  { href: "/admin", label: "Adicionar Jogo", icon: PlusCircle },
 ];
 
 export function Sidebar() {

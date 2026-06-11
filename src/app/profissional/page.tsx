@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { jogadosProfissional } from "@/data/jogos";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Jogo } from "@/types/jogo";
 
 function resultadoCor(resultado: string) {
   switch (resultado) {
@@ -16,30 +16,40 @@ function resultadoCor(resultado: string) {
 }
 
 export default function ProfissionalPage() {
+  const [jogadosProfissional, setJogadosProfissional] = useState<Jogo[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [campeonato, setCampeonato] = useState("Todos");
   const [resultado, setResultado] = useState("Todos");
   const [ano, setAno] = useState("Todos");
 
+  useEffect(() => {
+    fetch("/api/jogos?categoria=profissional")
+      .then((res) => res.json())
+      .then((data) => setJogadosProfissional(data))
+      .finally(() => setLoading(false));
+  }, []);
+
   const campeonatos = useMemo(
     () =>
-      Array.from(new Set(jogadosProfissional.map((j) => j.CAMPEONATO))).sort(),
-    []
+      Array.from(new Set(jogadosProfissional.map((j) => j.campeonato))).sort(),
+    [jogadosProfissional]
   );
   const anos = useMemo(
     () =>
-      Array.from(new Set(jogadosProfissional.map((j) => j.ANO))).sort(
-        (a, b) => b.localeCompare(a)
+      Array.from(new Set(jogadosProfissional.map((j) => j.ano))).sort((a, b) =>
+        b.localeCompare(a)
       ),
-    []
+    [jogadosProfissional]
   );
 
   const jogos = useMemo(() => {
     return [...jogadosProfissional]
-      .filter((j) => campeonato === "Todos" || j.CAMPEONATO === campeonato)
-      .filter((j) => resultado === "Todos" || j.RESULTADO === resultado)
-      .filter((j) => ano === "Todos" || j.ANO === ano)
-      .sort((a, b) => new Date(b.DATA).getTime() - new Date(a.DATA).getTime());
-  }, [campeonato, resultado, ano]);
+      .filter((j) => campeonato === "Todos" || j.campeonato === campeonato)
+      .filter((j) => resultado === "Todos" || j.resultado === resultado)
+      .filter((j) => ano === "Todos" || j.ano === ano)
+      .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+  }, [jogadosProfissional, campeonato, resultado, ano]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -103,22 +113,22 @@ export default function ProfissionalPage() {
           </thead>
           <tbody>
             {jogos.map((jogo) => (
-              <tr key={jogo.ID_JOGO} className="border-b border-border last:border-0">
-                <td className="px-4 py-3 whitespace-nowrap">{jogo.DATA}</td>
-                <td className="px-4 py-3">{jogo.ADVERSÁRIO}</td>
+              <tr key={jogo.id} className="border-b border-border last:border-0">
+                <td className="px-4 py-3 whitespace-nowrap">{jogo.data}</td>
+                <td className="px-4 py-3">{jogo.adversario}</td>
                 <td className="px-4 py-3 font-semibold">
-                  {jogo.GM} x {jogo.GS}
+                  {jogo.gm} x {jogo.gs}
                 </td>
-                <td className="px-4 py-3">{jogo["ESTÁDIO"]}</td>
-                <td className="px-4 py-3">{jogo.CAMPEONATO}</td>
+                <td className="px-4 py-3">{jogo.estadio}</td>
+                <td className="px-4 py-3">{jogo.campeonato}</td>
                 <td className="px-4 py-3">
                   <span
                     className={cn(
                       "rounded-full border px-2 py-1 text-xs font-bold",
-                      resultadoCor(jogo.RESULTADO)
+                      resultadoCor(jogo.resultado)
                     )}
                   >
-                    {jogo.RESULTADO}
+                    {jogo.resultado}
                   </span>
                 </td>
               </tr>
@@ -126,11 +136,15 @@ export default function ProfissionalPage() {
           </tbody>
         </table>
 
-        {jogos.length === 0 && (
+        {!loading && jogos.length === 0 && (
           <p className="p-6 text-muted-foreground">
-            Nenhum jogo encontrado com os filtros selecionados.
+            {jogadosProfissional.length === 0
+              ? "Nenhum jogo registrado ainda. Adicione jogos em /admin."
+              : "Nenhum jogo encontrado com os filtros selecionados."}
           </p>
         )}
+
+        {loading && <p className="p-6 text-muted-foreground">Carregando...</p>}
       </div>
     </div>
   );

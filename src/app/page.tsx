@@ -1,6 +1,9 @@
-import { jogadosProfissional } from "@/data/jogos";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Trophy, Goal, CalendarDays, Award } from "lucide-react";
 import { ClientCharts } from "./client-charts";
+import { Jogo } from "@/types/jogo";
 
 function StatCard({
   label,
@@ -25,31 +28,33 @@ function StatCard({
 }
 
 export default function DashboardPage() {
-  const totalJogos = jogadosProfissional.length;
+  const [jogos, setJogos] = useState<Jogo[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const vitorias = jogadosProfissional.filter(
-    (j) => j.RESULTADO === "Vitória"
-  ).length;
-  const empates = jogadosProfissional.filter(
-    (j) => j.RESULTADO === "Empate"
-  ).length;
-  const derrotas = jogadosProfissional.filter(
-    (j) => j.RESULTADO === "Derrota"
-  ).length;
+  useEffect(() => {
+    fetch("/api/jogos?categoria=profissional")
+      .then((res) => res.json())
+      .then((data) => setJogos(data))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const golsVistos = jogadosProfissional.reduce((acc, j) => acc + j.GM, 0);
+  const totalJogos = jogos.length;
 
-  const titulos = jogadosProfissional.filter(
-    (j) => j.STATUS === "Campeão"
-  ).length;
+  const vitorias = jogos.filter((j) => j.resultado === "Vitória").length;
+  const empates = jogos.filter((j) => j.resultado === "Empate").length;
+  const derrotas = jogos.filter((j) => j.resultado === "Derrota").length;
+
+  const golsVistos = jogos.reduce((acc, j) => acc + j.gm, 0);
+
+  const titulos = jogos.filter((j) => j.status === "Campeão").length;
 
   const jogosPorAno = Array.from(
-    jogadosProfissional.reduce((map, j) => {
-      map.set(j.ANO, (map.get(j.ANO) ?? 0) + 1);
+    jogos.reduce((map, j) => {
+      map.set(j.ano, (map.get(j.ano) ?? 0) + 1);
       return map;
     }, new Map<string, number>())
   )
-    .map(([ano, jogos]) => ({ ano, jogos }))
+    .map(([ano, jogosCount]) => ({ ano, jogos: jogosCount }))
     .sort((a, b) => a.ano.localeCompare(b.ano));
 
   const distribuicao = [
@@ -67,14 +72,27 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Jogos Acompanhados" value={totalJogos} icon={CalendarDays} />
-        <StatCard label="Vitórias" value={vitorias} icon={Trophy} />
-        <StatCard label="Gols Vistos" value={golsVistos} icon={Goal} />
-        <StatCard label="Títulos Presenciados" value={titulos} icon={Award} />
-      </div>
+      {loading ? (
+        <p className="text-muted-foreground">Carregando...</p>
+      ) : totalJogos === 0 ? (
+        <div className="rounded-lg border border-border bg-card p-6">
+          <p className="text-muted-foreground">
+            Nenhum jogo registrado ainda. Adicione jogos em{" "}
+            <code className="rounded bg-secondary px-1 py-0.5">/admin</code>.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Jogos Acompanhados" value={totalJogos} icon={CalendarDays} />
+            <StatCard label="Vitórias" value={vitorias} icon={Trophy} />
+            <StatCard label="Gols Vistos" value={golsVistos} icon={Goal} />
+            <StatCard label="Títulos Presenciados" value={titulos} icon={Award} />
+          </div>
 
-      <ClientCharts jogosPorAno={jogosPorAno} distribuicao={distribuicao} />
+          <ClientCharts jogosPorAno={jogosPorAno} distribuicao={distribuicao} />
+        </>
+      )}
     </div>
   );
 }

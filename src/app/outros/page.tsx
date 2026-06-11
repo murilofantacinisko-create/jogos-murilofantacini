@@ -1,5 +1,8 @@
-import { outrosCorinthians, outrosJogos, OutroCorinthians, OutroJogo } from "@/data/jogos";
+"use client";
+
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Jogo } from "@/types/jogo";
 
 function resultadoCor(resultado: string) {
   switch (resultado) {
@@ -12,50 +15,42 @@ function resultadoCor(resultado: string) {
   }
 }
 
-function JogoCard({ jogo }: { jogo: OutroCorinthians | OutroJogo }) {
+function JogoCard({ jogo }: { jogo: Jogo }) {
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-6">
       <p className="text-sm text-muted-foreground">
-        {jogo.DATA} • {jogo.CAMPEONATO}
+        {jogo.data} • {jogo.campeonato}
       </p>
       <p className="text-lg font-semibold">
-        {jogo.MANDANTE} x {jogo.VISITANTE}
+        {jogo.mando} x {jogo.adversario}
       </p>
       <div className="flex items-center gap-3">
         <p className="text-2xl font-bold">
-          {jogo.GM} - {jogo.GS}
+          {jogo.gm} - {jogo.gs}
         </p>
         <span
           className={cn(
             "rounded-full border px-2 py-1 text-xs font-bold",
-            resultadoCor(jogo.RESULTADO)
+            resultadoCor(jogo.resultado)
           )}
         >
-          {jogo.RESULTADO}
+          {jogo.resultado}
         </span>
       </div>
-      <p className="text-sm text-muted-foreground">{jogo["ESTÁDIO"]}</p>
-      {jogo.INFO && (
-        <p className="text-sm text-muted-foreground">{jogo.INFO}</p>
-      )}
-      {jogo["PÚBLICO"] !== null && jogo["PÚBLICO"] !== undefined && (
+      <p className="text-sm text-muted-foreground">{jogo.estadio}</p>
+      {jogo.info && <p className="text-sm text-muted-foreground">{jogo.info}</p>}
+      {jogo.publico !== null && (
         <p className="text-sm text-muted-foreground">
-          Público: {jogo["PÚBLICO"].toLocaleString("pt-BR")}
+          Público: {jogo.publico.toLocaleString("pt-BR")}
         </p>
       )}
     </div>
   );
 }
 
-function JogosGrid({
-  titulo,
-  jogos,
-}: {
-  titulo: string;
-  jogos: (OutroCorinthians | OutroJogo)[];
-}) {
+function JogosGrid({ titulo, jogos }: { titulo: string; jogos: Jogo[] }) {
   const ordenados = [...jogos].sort(
-    (a, b) => new Date(b.DATA).getTime() - new Date(a.DATA).getTime()
+    (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
   );
 
   return (
@@ -63,12 +58,14 @@ function JogosGrid({
       <h2 className="text-xl font-semibold">{titulo}</h2>
       {ordenados.length === 0 ? (
         <div className="rounded-lg border border-border bg-card p-6">
-          <p className="text-muted-foreground">Nenhum jogo registrado ainda.</p>
+          <p className="text-muted-foreground">
+            Nenhum jogo registrado ainda. Adicione jogos em /admin.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {ordenados.map((jogo, i) => (
-            <JogoCard key={i} jogo={jogo} />
+          {ordenados.map((jogo) => (
+            <JogoCard key={jogo.id} jogo={jogo} />
           ))}
         </div>
       )}
@@ -77,6 +74,22 @@ function JogosGrid({
 }
 
 export default function OutrosPage() {
+  const [outrosCorinthians, setOutrosCorinthians] = useState<Jogo[]>([]);
+  const [outrosJogos, setOutrosJogos] = useState<Jogo[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/jogos?categoria=outros-corinthians").then((res) => res.json()),
+      fetch("/api/jogos?categoria=outros-jogos").then((res) => res.json()),
+    ])
+      .then(([corinthians, jogos]) => {
+        setOutrosCorinthians(corinthians);
+        setOutrosJogos(jogos);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -86,8 +99,14 @@ export default function OutrosPage() {
         </p>
       </div>
 
-      <JogosGrid titulo="Outros Corinthians" jogos={outrosCorinthians} />
-      <JogosGrid titulo="Outros Jogos" jogos={outrosJogos} />
+      {loading ? (
+        <p className="text-muted-foreground">Carregando...</p>
+      ) : (
+        <>
+          <JogosGrid titulo="Outros Corinthians" jogos={outrosCorinthians} />
+          <JogosGrid titulo="Outros Jogos" jogos={outrosJogos} />
+        </>
+      )}
     </div>
   );
 }
