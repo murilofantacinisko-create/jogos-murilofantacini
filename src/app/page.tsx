@@ -627,7 +627,7 @@ export default function DashboardPage() {
               }
               sub={
                 jogoMaiorPublico
-                  ? `vs ${jogoMaiorPublico.adversario} • ${formatData(jogoMaiorPublico.data)}`
+                  ? `vs ${jogoMaiorPublico.adversario} • ${jogoMaiorPublico.estadio} • ${jogoMaiorPublico.campeonato} • ${formatData(jogoMaiorPublico.data)}`
                   : "Nenhum jogo com público informado"
               }
             />
