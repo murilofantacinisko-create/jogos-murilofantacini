@@ -65,18 +65,36 @@ function resultadoLetra(resultado: string): string {
   }
 }
 
+type Visao = "profissional" | "outros";
+
 export default function DashboardPage() {
-  const [jogos, setJogos] = useState<Jogo[]>([]);
+  const [jogosProfissional, setJogosProfissional] = useState<Jogo[]>([]);
+  const [jogosOutros, setJogosOutros] = useState<Jogo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visao, setVisao] = useState<Visao>("profissional");
   const [ano, setAno] = useState("Todos");
   const [campeonato, setCampeonato] = useState("Todos");
 
   useEffect(() => {
-    fetch("/api/jogos?categoria=profissional")
-      .then((res) => res.json())
-      .then((data) => setJogos(data))
+    Promise.all([
+      fetch("/api/jogos?categoria=profissional").then((res) => res.json()),
+      fetch("/api/jogos?categoria=outros-corinthians").then((res) => res.json()),
+      fetch("/api/jogos?categoria=outros-jogos").then((res) => res.json()),
+    ])
+      .then(([profissional, outrosCorinthians, outrosJogos]) => {
+        setJogosProfissional(profissional);
+        setJogosOutros([...outrosCorinthians, ...outrosJogos]);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const jogos = visao === "profissional" ? jogosProfissional : jogosOutros;
+
+  function selecionarVisao(novaVisao: Visao) {
+    setVisao(novaVisao);
+    setAno("Todos");
+    setCampeonato("Todos");
+  }
 
   const anos = useMemo(
     () =>
@@ -245,6 +263,33 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">
           Resumo geral dos jogos acompanhados
         </p>
+      </div>
+
+      <div className="flex w-fit rounded-lg border border-border bg-card p-1">
+        <button
+          type="button"
+          onClick={() => selecionarVisao("profissional")}
+          className={cn(
+            "rounded-md px-4 py-2 text-sm font-medium transition-colors",
+            visao === "profissional"
+              ? "bg-corinthians-red text-white"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Corinthians Profissional
+        </button>
+        <button
+          type="button"
+          onClick={() => selecionarVisao("outros")}
+          className={cn(
+            "rounded-md px-4 py-2 text-sm font-medium transition-colors",
+            visao === "outros"
+              ? "bg-corinthians-red text-white"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Outros Jogos
+        </button>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row">
