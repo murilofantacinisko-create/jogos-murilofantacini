@@ -106,7 +106,24 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="relative">
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundImage: `url('/estadio.jpeg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl font-bold">Adicionar Jogo</h1>
         <p className="text-muted-foreground">
@@ -370,6 +387,7 @@ export default function AdminPage() {
           {status && <p className="text-sm text-muted-foreground">{status}</p>}
         </div>
       </form>
+      </div>
     </div>
   );
 }
