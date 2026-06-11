@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Trophy, Grid2x2, PlusCircle } from "lucide-react";
+import { LayoutDashboard, Trophy, Grid2x2, PlusCircle, LogOut } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -14,6 +15,7 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { status } = useSession();
 
   return (
     <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col overflow-y-auto border-r border-border bg-card">
@@ -55,6 +57,18 @@ export function Sidebar() {
           Vai, Corinthians!
         </span>
       </div>
+
+      {status === "authenticated" && (
+        <div className="border-t border-border p-4">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            <LogOut className="h-5 w-5" />
+            Sair
+          </button>
+        </div>
+      )}
     </aside>
   );
 }
