@@ -21,10 +21,10 @@ export async function getTeamLogo(team: string): Promise<string | null> {
 
   try {
     const res = await fetch(
-      `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(searchName)}`
+      `/api/team-logo?team=${encodeURIComponent(searchName)}`
     );
     const data = await res.json();
-    const logo = data?.teams?.[0]?.strTeamBadge ?? null;
+    const logo = data?.logo ?? null;
     logoCache[team] = logo;
     return logo;
   } catch {
