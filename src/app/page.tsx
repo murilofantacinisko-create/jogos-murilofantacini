@@ -32,14 +32,39 @@ function StatCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-6">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
-        <Icon className="h-6 w-6" />
+    <div className="flex items-center gap-4 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
+        <Icon className="h-5 w-5" />
       </div>
       <div>
         <p className="text-sm text-muted-foreground">{label}</p>
         <p className="text-2xl font-bold">{value}</p>
       </div>
+    </div>
+  );
+}
+
+function HighlightCard({
+  label,
+  icon: Icon,
+  iconClassName,
+  main,
+  sub,
+}: {
+  label: string;
+  icon: React.ElementType;
+  iconClassName?: string;
+  main: string;
+  sub: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-4">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Icon className={cn("h-4 w-4 shrink-0", iconClassName)} />
+        <span className="truncate">{label}</span>
+      </div>
+      <p className="truncate text-lg font-bold leading-tight">{main}</p>
+      <p className="truncate text-xs text-muted-foreground">{sub}</p>
     </div>
   );
 }
@@ -290,10 +315,6 @@ export default function DashboardPage() {
 
   const estadioMaisVisitado = topEstadios[0] ?? null;
 
-  const pctVitorias = totalJogos ? (vitorias / totalJogos) * 100 : 0;
-  const pctEmpates = totalJogos ? (empates / totalJogos) * 100 : 0;
-  const pctDerrotas = totalJogos ? (derrotas / totalJogos) * 100 : 0;
-
   const melhorVitoria = jogosFiltrados
     .filter((j) => j.resultado === "Vitória")
     .reduce<Jogo | null>((best, j) => {
@@ -338,7 +359,7 @@ export default function DashboardPage() {
   })();
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold sm:text-4xl">
           Meu Histórico <span className="text-corinthians-red">Alvinegro</span>
@@ -349,7 +370,7 @@ export default function DashboardPage() {
       </div>
 
       {visao === "profissional" && totalJogos > 0 && (
-        <div className="flex flex-col gap-6 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 rounded-lg border border-border border-l-4 border-l-corinthians-red bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <SccpCrest size="h-16 w-16" />
             <div>
@@ -482,43 +503,19 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">Maior Público</h2>
-              {jogoMaiorPublico ? (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
-                    <Trophy className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {jogoMaiorPublico.publico.toLocaleString("pt-BR")}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      vs {jogoMaiorPublico.adversario} •{" "}
-                      {formatData(jogoMaiorPublico.data)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">
-                  Nenhum jogo com público informado.
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">Últimos 5 Jogos</h2>
-              <div className="flex items-start gap-3">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="rounded-lg border border-border bg-card p-4 lg:col-span-2">
+              <h2 className="mb-3 text-base font-semibold">Últimos 5 Jogos</h2>
+              <div className="flex items-start gap-4">
                 {ultimosCinco.map((j) => (
                   <div
                     key={j.id}
                     title={`${j.mando} x ${j.adversario} (${j.gm}-${j.gs}) - ${formatData(j.data)}`}
-                    className="flex flex-col items-center gap-2 text-center"
+                    className="flex flex-col items-center gap-1.5 text-center"
                   >
                     <div
                       className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white",
+                        "flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white",
                         resultadoCorBolinha(j.resultado)
                       )}
                     >
@@ -527,158 +524,100 @@ export default function DashboardPage() {
                     <p className="text-xs font-semibold">
                       {j.gm} x {j.gs}
                     </p>
-                    <p className="w-16 text-xs text-muted-foreground">
+                    <p className="w-16 truncate text-xs text-muted-foreground">
                       {j.adversario}
                     </p>
                   </div>
                 ))}
               </div>
             </div>
+
+            <HighlightCard
+              label="Maior Público"
+              icon={Users}
+              main={
+                jogoMaiorPublico
+                  ? jogoMaiorPublico.publico.toLocaleString("pt-BR")
+                  : "-"
+              }
+              sub={
+                jogoMaiorPublico
+                  ? `vs ${jogoMaiorPublico.adversario} • ${formatData(jogoMaiorPublico.data)}`
+                  : "Nenhum jogo com público informado"
+              }
+            />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-lg border border-green-700/50 bg-card p-6">
-              <p className="text-sm text-muted-foreground">Vitórias</p>
-              <p className="text-2xl font-bold text-green-400">{vitorias}</p>
-              <p className="text-sm text-muted-foreground">
-                {pctVitorias.toFixed(1)}% dos jogos
-              </p>
-            </div>
-            <div className="rounded-lg border border-yellow-700/50 bg-card p-6">
-              <p className="text-sm text-muted-foreground">Empates</p>
-              <p className="text-2xl font-bold text-yellow-400">{empates}</p>
-              <p className="text-sm text-muted-foreground">
-                {pctEmpates.toFixed(1)}% dos jogos
-              </p>
-            </div>
-            <div className="rounded-lg border border-corinthians-red/50 bg-card p-6">
-              <p className="text-sm text-muted-foreground">Derrotas</p>
-              <p className="text-2xl font-bold text-red-400">{derrotas}</p>
-              <p className="text-sm text-muted-foreground">
-                {pctDerrotas.toFixed(1)}% dos jogos
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">Melhor Vitória</h2>
-              {melhorVitoria ? (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-green-700/20 text-green-400">
-                    <Trophy className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {melhorVitoria.gm} - {melhorVitoria.gs}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      vs {melhorVitoria.adversario} •{" "}
-                      {formatData(melhorVitoria.data)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Nenhuma vitória registrada.</p>
-              )}
-            </div>
-
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">Pior Derrota</h2>
-              {piorDerrota ? (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
-                    <Goal className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {piorDerrota.gm} - {piorDerrota.gs}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      vs {piorDerrota.adversario} •{" "}
-                      {formatData(piorDerrota.data)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Nenhuma derrota registrada.</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">
-                Maior Sequência Invicta
-              </h2>
-              {maiorSequenciaInvicta ? (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
-                    <Award className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {maiorSequenciaInvicta.tamanho} jogo
-                      {maiorSequenciaInvicta.tamanho !== 1 ? "s" : ""}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatData(maiorSequenciaInvicta.inicio.data)} até{" "}
-                      {formatData(maiorSequenciaInvicta.fim.data)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Nenhuma sequência registrada.</p>
-              )}
-            </div>
-
-            <div className="rounded-lg border border-corinthians-red bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">Estádio Mais Visitado</h2>
-              {estadioMaisVisitado ? (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
-                    <MapPin className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {estadioMaisVisitado.estadio}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {estadioMaisVisitado.jogos} jogo
-                      {estadioMaisVisitado.jogos !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Nenhum jogo registrado.</p>
-              )}
-            </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <HighlightCard
+              label="Melhor Vitória"
+              icon={Trophy}
+              iconClassName="text-green-400"
+              main={melhorVitoria ? `${melhorVitoria.gm} - ${melhorVitoria.gs}` : "-"}
+              sub={
+                melhorVitoria
+                  ? `vs ${melhorVitoria.adversario} • ${formatData(melhorVitoria.data)}`
+                  : "Nenhuma vitória registrada"
+              }
+            />
+            <HighlightCard
+              label="Pior Derrota"
+              icon={Goal}
+              main={piorDerrota ? `${piorDerrota.gm} - ${piorDerrota.gs}` : "-"}
+              sub={
+                piorDerrota
+                  ? `vs ${piorDerrota.adversario} • ${formatData(piorDerrota.data)}`
+                  : "Nenhuma derrota registrada"
+              }
+            />
+            <HighlightCard
+              label="Maior Sequência Invicta"
+              icon={Award}
+              main={
+                maiorSequenciaInvicta
+                  ? `${maiorSequenciaInvicta.tamanho} jogo${maiorSequenciaInvicta.tamanho !== 1 ? "s" : ""}`
+                  : "-"
+              }
+              sub={
+                maiorSequenciaInvicta
+                  ? `${formatData(maiorSequenciaInvicta.inicio.data)} até ${formatData(maiorSequenciaInvicta.fim.data)}`
+                  : "Nenhuma sequência registrada"
+              }
+            />
+            <HighlightCard
+              label="Estádio Mais Visitado"
+              icon={MapPin}
+              main={estadioMaisVisitado ? estadioMaisVisitado.estadio : "-"}
+              sub={
+                estadioMaisVisitado
+                  ? `${estadioMaisVisitado.jogos} jogo${estadioMaisVisitado.jogos !== 1 ? "s" : ""}`
+                  : "Nenhum jogo registrado"
+              }
+            />
           </div>
 
           <div>
-            <h2 className="mb-4 text-2xl font-bold">Conquistas</h2>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-              <div className="rounded-lg border border-border bg-card p-6 lg:col-span-2">
-                <h3 className="mb-4 text-xl font-semibold">
+            <h2 className="mb-3 text-xl font-bold">Conquistas</h2>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+              <div className="rounded-lg border border-border bg-card p-4 lg:col-span-2">
+                <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
                   Títulos Presenciados
                 </h3>
                 {titulosConquistados.length === 0 ? (
-                  <p className="text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Nenhum título presenciado.
                   </p>
                 ) : (
-                  <ul className="flex flex-col gap-3">
+                  <ul className="flex max-h-40 flex-col gap-1.5 overflow-y-auto">
                     {titulosConquistados.map((j) => (
                       <li
                         key={j.id}
-                        className="flex items-center gap-4 rounded-md border border-border px-3 py-2 text-sm"
+                        className="flex items-center gap-3 rounded-md border border-border px-2 py-1.5 text-xs"
                       >
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
-                          <Award className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{j.campeonato}</p>
-                          <p className="text-muted-foreground">
+                        <Award className="h-4 w-4 shrink-0 text-corinthians-red" />
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{j.campeonato}</p>
+                          <p className="truncate text-muted-foreground">
                             vs {j.adversario} • {formatData(j.data)}
                           </p>
                         </div>
@@ -688,34 +627,34 @@ export default function DashboardPage() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-4">
-                <StatCard label="Finais" value={totalFinais} icon={Trophy} />
+              <StatCard label="Finais" value={totalFinais} icon={Trophy} />
 
-                <div className="rounded-lg border border-border bg-card p-6">
-                  <h3 className="mb-4 text-lg font-semibold">Fases Especiais</h3>
-                  <ul className="flex flex-col gap-2">
-                    {fasesEspeciais.map((f) => {
-                      const max = Math.max(
-                        1,
-                        ...fasesEspeciais.map((x) => x.jogos)
-                      );
-                      return (
-                        <li key={f.fase} className="flex flex-col gap-1 text-sm">
-                          <div className="flex items-center justify-between">
-                            <span>{f.fase}</span>
-                            <span className="text-muted-foreground">{f.jogos}</span>
-                          </div>
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-                            <div
-                              className="h-full rounded-full bg-corinthians-red"
-                              style={{ width: `${(f.jogos / max) * 100}%` }}
-                            />
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+              <div className="rounded-lg border border-border bg-card p-4">
+                <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
+                  Fases Especiais
+                </h3>
+                <ul className="flex flex-col gap-1.5">
+                  {fasesEspeciais.map((f) => {
+                    const max = Math.max(
+                      1,
+                      ...fasesEspeciais.map((x) => x.jogos)
+                    );
+                    return (
+                      <li key={f.fase} className="flex flex-col gap-1 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span>{f.fase}</span>
+                          <span className="text-muted-foreground">{f.jogos}</span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                          <div
+                            className="h-full rounded-full bg-corinthians-red"
+                            style={{ width: `${(f.jogos / max) * 100}%` }}
+                          />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             </div>
           </div>
@@ -730,11 +669,11 @@ export default function DashboardPage() {
           />
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <h2 className="mb-3 text-sm font-semibold">
                 Adversários Mais Frequentes
               </h2>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2 text-sm">
                 {topAdversarios.map((a) => (
                   <li
                     key={a.adversario}
@@ -750,11 +689,11 @@ export default function DashboardPage() {
               </ul>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 text-xl font-semibold">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <h2 className="mb-3 text-sm font-semibold">
                 Artilheiros Mais Vistos
               </h2>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2 text-sm">
                 {topArtilheiros.map((a) => (
                   <li
                     key={a.atleta}
@@ -769,12 +708,12 @@ export default function DashboardPage() {
               </ul>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
-                <MapPin className="h-5 w-5" />
+            <div className="rounded-lg border border-border bg-card p-4">
+              <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                <MapPin className="h-4 w-4" />
                 Estádios Mais Frequentados
               </h2>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2 text-sm">
                 {topEstadios.map((e) => (
                   <li
                     key={e.estadio}
