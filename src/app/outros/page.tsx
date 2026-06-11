@@ -95,22 +95,40 @@ export default function OutrosPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-3xl font-bold">Outros Jogos</h1>
-        <p className="text-muted-foreground">
-          Outros jogos acompanhados, fora do profissional do Corinthians
-        </p>
-      </div>
+    <div className="relative">
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundImage: `url('/estadio.jpeg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
 
-      {loading ? (
-        <p className="text-muted-foreground">Carregando...</p>
-      ) : (
-        <>
-          <JogosGrid titulo="Outros Corinthians" jogos={outrosCorinthians} />
-          <JogosGrid titulo="Outros Jogos" jogos={outrosJogos} />
-        </>
-      )}
+      <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-8">
+        <div>
+          <h1 className="text-3xl font-bold">Outros Jogos</h1>
+          <p className="text-muted-foreground">
+            Outros jogos acompanhados, fora do profissional do Corinthians
+          </p>
+        </div>
+
+        {loading ? (
+          <p className="text-muted-foreground">Carregando...</p>
+        ) : (
+          <>
+            <JogosGrid titulo="Outros Corinthians" jogos={outrosCorinthians} />
+            <JogosGrid titulo="Outros Jogos" jogos={outrosJogos} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
