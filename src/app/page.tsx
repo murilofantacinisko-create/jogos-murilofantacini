@@ -8,6 +8,7 @@ import {
   Users,
   Target,
   MapPin,
+  Award,
 } from "lucide-react";
 import { ClientCharts } from "./client-charts";
 import { Jogo } from "@/types/jogo";
@@ -144,6 +145,24 @@ export default function DashboardPage() {
   const ultimosCinco = [...jogosFiltrados]
     .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
     .slice(-5);
+
+  const titulosConquistados = jogosFiltrados
+    .filter((j) => j.status.includes("Campeão"))
+    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+
+  const totalFinais = jogosFiltrados.filter((j) => j.fase.includes("Final")).length;
+
+  const FASES_ESPECIAIS = [
+    { label: "Finais", match: (fase: string) => fase.includes("Final") },
+    { label: "Semifinais", match: (fase: string) => fase.includes("Semi") },
+    { label: "Quartas", match: (fase: string) => fase.includes("Quartas") },
+    { label: "Grupos", match: (fase: string) => fase.includes("Grupos") },
+    { label: "Pts Corridos", match: (fase: string) => fase.includes("Pts Corridos") },
+  ];
+  const fasesEspeciais = FASES_ESPECIAIS.map(({ label, match }) => ({
+    fase: label,
+    jogos: jogosFiltrados.filter((j) => match(j.fase)).length,
+  }));
 
   const jogosPorAno = Array.from(
     jogosFiltrados.reduce((map, j) => {
@@ -393,6 +412,71 @@ export default function DashboardPage() {
                     {resultadoLetra(j.resultado)}
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="mb-4 text-2xl font-bold">Conquistas</h2>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div className="rounded-lg border border-border bg-card p-6 lg:col-span-2">
+                <h3 className="mb-4 text-xl font-semibold">
+                  Títulos Presenciados
+                </h3>
+                {titulosConquistados.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    Nenhum título presenciado.
+                  </p>
+                ) : (
+                  <ul className="flex flex-col gap-3">
+                    {titulosConquistados.map((j) => (
+                      <li
+                        key={j.id}
+                        className="flex items-center gap-4 rounded-md border border-border px-3 py-2 text-sm"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-corinthians-red/20 text-corinthians-red">
+                          <Award className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{j.campeonato}</p>
+                          <p className="text-muted-foreground">
+                            vs {j.adversario} • {formatData(j.data)}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <StatCard label="Finais" value={totalFinais} icon={Trophy} />
+
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <h3 className="mb-4 text-lg font-semibold">Fases Especiais</h3>
+                  <ul className="flex flex-col gap-2">
+                    {fasesEspeciais.map((f) => {
+                      const max = Math.max(
+                        1,
+                        ...fasesEspeciais.map((x) => x.jogos)
+                      );
+                      return (
+                        <li key={f.fase} className="flex flex-col gap-1 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span>{f.fase}</span>
+                            <span className="text-muted-foreground">{f.jogos}</span>
+                          </div>
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                            <div
+                              className="h-full rounded-full bg-corinthians-red"
+                              style={{ width: `${(f.jogos / max) * 100}%` }}
+                            />
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
