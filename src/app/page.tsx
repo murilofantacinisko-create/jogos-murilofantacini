@@ -375,10 +375,20 @@ export default function DashboardPage() {
       <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold sm:text-4xl">
-          Meu Histórico <span className="text-corinthians-red">Alvinegro</span>
+          {visao === "profissional" ? (
+            <>
+              Meu Histórico <span className="text-corinthians-red">Alvinegro</span>
+            </>
+          ) : (
+            <>
+              Meu Histórico <span className="text-corinthians-red">Geral</span>
+            </>
+          )}
         </h1>
         <p className="text-muted-foreground">
-          Acompanhe todos os jogos que você já esteve presente.
+          {visao === "profissional"
+            ? "Acompanhe todos os jogos do Corinthians que você já esteve presente."
+            : "Acompanhe todos os jogos que você já esteve presente."}
         </p>
       </div>
 
