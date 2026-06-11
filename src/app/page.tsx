@@ -125,30 +125,6 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    const main = document.getElementById("main-content");
-    if (!main) return;
-
-    if (visao === "outros") {
-      main.style.backgroundImage = "url('/estadio.jpeg')";
-      main.style.backgroundSize = "cover";
-      main.style.backgroundPosition = "center";
-      main.style.backgroundRepeat = "no-repeat";
-    } else {
-      main.style.backgroundImage = "";
-      main.style.backgroundSize = "";
-      main.style.backgroundPosition = "";
-      main.style.backgroundRepeat = "";
-    }
-
-    return () => {
-      main.style.backgroundImage = "";
-      main.style.backgroundSize = "";
-      main.style.backgroundPosition = "";
-      main.style.backgroundRepeat = "";
-    };
-  }, [visao]);
-
   const jogos = visao === "profissional" ? jogosProfissional : jogosOutros;
 
   function selecionarVisao(novaVisao: Visao) {
@@ -396,17 +372,22 @@ export default function DashboardPage() {
         }}
       />
 
-      {visao === "outros" && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 0,
-            pointerEvents: "none",
-            background: "rgba(0,0,0,0.5)",
-          }}
-        />
-      )}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundImage: `url('/estadio.jpeg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+          display: visao === "outros" ? "block" : "none",
+        }}
+      />
 
       <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-6">
       <div>
