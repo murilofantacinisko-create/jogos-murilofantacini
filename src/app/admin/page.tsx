@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { hasAdminSession } from "@/lib/client-auth";
 
 interface GolForm {
   atleta: string;
@@ -40,6 +42,8 @@ function faixaMinuto(minuto: number): string {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [form, setForm] = useState(initialForm);
   const [gols, setGols] = useState<GolForm[]>([]);
   const [status, setStatusMsg] = useState<string | null>(null);
@@ -65,6 +69,12 @@ export default function AdminPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!hasAdminSession()) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+
     setSubmitting(true);
     setStatusMsg(null);
 

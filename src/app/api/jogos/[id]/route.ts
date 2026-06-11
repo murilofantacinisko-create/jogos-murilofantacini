@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isAuthenticated } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -24,6 +25,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
   const id = Number(params.id);
   const body = await request.json();
 
@@ -87,6 +92,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
   await prisma.jogo.delete({ where: { id: Number(params.id) } });
 
   return NextResponse.json({ success: true });
