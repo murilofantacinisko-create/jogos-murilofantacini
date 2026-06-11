@@ -74,7 +74,7 @@ function SccpCrest() {
     <img
       src="/corinthians.png.png"
       alt="SCCP"
-      style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }}
+      style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
       className="shrink-0"
     />
   );
@@ -358,19 +358,24 @@ export default function DashboardPage() {
 
   return (
     <div className="relative">
-      {visao === "profissional" && (
-        <div
-          className="pointer-events-none fixed left-0 top-0 z-0 h-full w-full"
-          style={{
-            backgroundImage: "url('/arena.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.06,
-          }}
-        />
-      )}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundImage: "url('/arena.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: "none",
+          display: visao === "profissional" ? "block" : "none",
+        }}
+      />
 
-      <div className="relative z-10 flex flex-col gap-6">
+      <div style={{ position: "relative", zIndex: 1 }} className="flex flex-col gap-6">
       <div>
         <h1 className="text-3xl font-bold sm:text-4xl">
           Meu Histórico <span className="text-corinthians-red">Alvinegro</span>

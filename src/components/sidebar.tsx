@@ -49,7 +49,7 @@ export function Sidebar() {
         <img
           src="/corinthians.png.png"
           alt="SCCP"
-          style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }}
+          style={{ width: 52, height: 52, objectFit: "contain", borderRadius: "50%" }}
         />
         <span className="text-sm font-bold text-corinthians-red">
           Vai, Corinthians!
