@@ -20,6 +20,7 @@ const espnTeamIds: Record<string, string> = {
   Vasco: "3454",
   Vitória: "3457",
   Bahia: "9967",
+  "Botafogo-SP": "4584",
   Sport: "3459",
   "América-MG": "3460",
   "Ponte Preta": "3461",
