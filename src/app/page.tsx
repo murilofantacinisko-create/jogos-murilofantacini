@@ -454,6 +454,20 @@ export default function DashboardPage() {
     return melhor as { tamanho: number; inicio: Jogo; fim: Jogo } | null;
   })();
 
+  function vsLabel(j: Jogo): string {
+    return visao === "outros" ? `${j.mando} vs ${j.adversario}` : `vs ${j.adversario}`;
+  }
+
+  const timesMaisVistos = Array.from(
+    jogosFiltrados.reduce((map, j) => {
+      map.set(j.mando, (map.get(j.mando) ?? 0) + 1);
+      map.set(j.adversario, (map.get(j.adversario) ?? 0) + 1);
+      return map;
+    }, new Map<string, number>())
+  )
+    .map(([time, jogosCount]) => ({ time, jogos: jogosCount }))
+    .sort((a, b) => b.jogos - a.jogos);
+
   return (
     <div className="relative">
       <div
@@ -703,7 +717,7 @@ export default function DashboardPage() {
               }
               sub={
                 jogoMaiorPublico
-                  ? `vs ${jogoMaiorPublico.adversario} • ${jogoMaiorPublico.estadio} • ${jogoMaiorPublico.campeonato} • ${formatData(jogoMaiorPublico.data)}`
+                  ? `${vsLabel(jogoMaiorPublico)} • ${jogoMaiorPublico.estadio} • ${jogoMaiorPublico.campeonato} • ${formatData(jogoMaiorPublico.data)}`
                   : "Nenhum jogo com público informado"
               }
             />
@@ -717,7 +731,7 @@ export default function DashboardPage() {
               main={melhorVitoria ? `${melhorVitoria.gm} - ${melhorVitoria.gs}` : "-"}
               sub={
                 melhorVitoria
-                  ? `vs ${melhorVitoria.adversario} • ${formatData(melhorVitoria.data)}`
+                  ? `${vsLabel(melhorVitoria)} • ${formatData(melhorVitoria.data)}`
                   : "Nenhuma vitória registrada"
               }
             />
@@ -727,7 +741,7 @@ export default function DashboardPage() {
               main={piorDerrota ? `${piorDerrota.gm} - ${piorDerrota.gs}` : "-"}
               sub={
                 piorDerrota
-                  ? `vs ${piorDerrota.adversario} • ${formatData(piorDerrota.data)}`
+                  ? `${vsLabel(piorDerrota)} • ${formatData(piorDerrota.data)}`
                   : "Nenhuma derrota registrada"
               }
             />
@@ -779,7 +793,7 @@ export default function DashboardPage() {
                         <div className="min-w-0">
                           <p className="truncate font-medium">{j.campeonato}</p>
                           <p className="truncate text-muted-foreground">
-                            vs {j.adversario} • {formatData(j.data)}
+                            {vsLabel(j)} • {formatData(j.data)}
                           </p>
                         </div>
                       </li>
@@ -832,24 +846,39 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="rounded-lg border border-border bg-card p-4">
               <h2 className="mb-3 text-sm font-semibold">
-                Adversários Mais Frequentes
+                {visao === "outros" ? "Times Mais Vistos" : "Adversários Mais Frequentes"}
               </h2>
               <ul className="scrollbar-thin flex max-h-[200px] flex-col gap-2 overflow-y-auto text-sm">
-                {topAdversarios.map((a) => (
-                  <li
-                    key={a.adversario}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="flex items-center gap-2">
-                      <TeamLogo team={a.adversario} size={24} />
-                      {a.adversario}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {a.jogos} jogo{a.jogos !== 1 ? "s" : ""} •{" "}
-                      {a.aproveitamento.toFixed(1)}%
-                    </span>
-                  </li>
-                ))}
+                {visao === "outros"
+                  ? timesMaisVistos.map((t) => (
+                      <li
+                        key={t.time}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="flex items-center gap-2">
+                          <TeamLogo team={t.time} size={24} />
+                          {t.time}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {t.jogos} jogo{t.jogos !== 1 ? "s" : ""}
+                        </span>
+                      </li>
+                    ))
+                  : topAdversarios.map((a) => (
+                      <li
+                        key={a.adversario}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="flex items-center gap-2">
+                          <TeamLogo team={a.adversario} size={24} />
+                          {a.adversario}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {a.jogos} jogo{a.jogos !== 1 ? "s" : ""} •{" "}
+                          {a.aproveitamento.toFixed(1)}%
+                        </span>
+                      </li>
+                    ))}
               </ul>
             </div>
 
